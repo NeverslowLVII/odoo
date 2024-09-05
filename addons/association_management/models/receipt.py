@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+import base64
 
 class AssociationReceipt(models.Model):
     _name = 'association.receipt'
@@ -9,13 +10,14 @@ class AssociationReceipt(models.Model):
     name = fields.Char(string='Numéro de reçu', required=True, copy=False, readonly=True, default='New')
     date = fields.Date(string='Date de reçu', required=True, default=fields.Date.context_today)
     amount = fields.Float(string='Montant', required=True)
-    image = fields.Binary(string='Image scannée', attachment=True)
+    image = fields.Binary(string='Image du reçu', attachment=True)
     event_id = fields.Many2one('association.event', string='Événement associé')
     state = fields.Selection([
         ('draft', 'Brouillon'),
         ('validated', 'Validé'),
         ('cancelled', 'Annulé')
     ], string='Statut', default='draft', tracking=True)
+    scanned_image = fields.Binary(string='Image scannée du reçu', attachment=True)
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -37,3 +39,7 @@ class AssociationReceipt(models.Model):
     def action_draft(self):
         for receipt in self:
             receipt.state = 'draft'
+
+    def attach_scanned_image(self, image_data):
+        self.scanned_image = base64.b64encode(image_data)
+

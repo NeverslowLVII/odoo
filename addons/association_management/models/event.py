@@ -64,3 +64,34 @@ class AssociationEvent(models.Model):
         template = self.env.ref('association_management.email_template_event_thank_you')
         for participant in self.present_participant_ids:
             template.send_mail(participant.id, force_send=True)
+
+    def generate_participant_labels(self):
+        try:
+            from reportlab.graphics import shapes
+            from reportlab.lib import colors
+            from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+            from reportlab.lib.pagesizes import letter
+        except ImportError:
+            raise UserError(_("La bibliothèque ReportLab n'est pas installée. Veuillez l'installer pour utiliser cette fonctionnalité."))
+
+        doc = SimpleDocTemplate("participant_labels.pdf", pagesize=letter)
+        elements = []
+        data = [[participant.name, participant.email] for participant in self.participant_ids]
+        t = Table(data)
+        t.setStyle(TableStyle([('BACKGROUND', (0,0), (-1,0), colors.grey),
+                               ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+                               ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                               ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+                               ('FONTSIZE', (0,0), (-1,0), 14),
+                               ('BOTTOMPADDING', (0,0), (-1,0), 12),
+                               ('BACKGROUND', (0,1), (-1,-1), colors.beige),
+                               ('TEXTCOLOR', (0,1), (-1,-1), colors.black),
+                               ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                               ('FONTNAME', (0,1), (-1,-1), 'Helvetica'),
+                               ('FONTSIZE', (0,1), (-1,-1), 12),
+                               ('TOPPADDING', (0,1), (-1,-1), 6),
+                               ('BOTTOMPADDING', (0,1), (-1,-1), 6),
+                               ('GRID', (0,0), (-1,-1), 1, colors.black)]))
+        elements.append(t)
+        doc.build(elements)
+        return doc

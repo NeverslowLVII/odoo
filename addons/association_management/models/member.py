@@ -51,6 +51,8 @@ class AssociationMember(models.Model):
     is_renewal = fields.Boolean(string='Renouvellement', compute='_compute_is_renewal', store=True)
     renewal_alert = fields.Boolean(string='Alerte de renouvellement', default=False)
 
+    first_membership_date = fields.Date(string='Date de première adhésion', default=fields.Date.today)
+
     @api.depends('birth_date')
     def _compute_age(self):
         today = date.today()
@@ -94,20 +96,17 @@ class AssociationMember(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            partner = self.env['res.partner'].search([
-                '|', ('email', '=', vals.get('email')),
-                '&', ('name', '=', vals.get('name')),
-                ('phone', '=', vals.get('phone'))
-            ], limit=1)
-
-            if not partner:
+            if not vals.get('partner_id'):
                 partner = self.env['res.partner'].create({
                     'name': vals.get('name'),
                     'email': vals.get('email'),
                     'phone': vals.get('phone'),
                 })
+                vals['partner_id'] = partner.id
             
-            vals['partner_id'] = partner.id
+            if 'first_membership_date' not in vals:
+                vals['first_membership_date'] = fields.Date.today()
+        
         return super(AssociationMember, self).create(vals_list)
 
     def unlink(self):
@@ -189,4 +188,19 @@ class AssociationMember(models.Model):
             'honorary': 0,
         }
         return prices.get(membership_type, 0)
+
+    @api.model
+    def create(self, vals):
+        if not vals.get('partner_id'):
+            partner = self.env['res.partner'].create({
+                'name': vals.get('name'),
+                'email': vals.get('email'),
+                'phone': vals.get('phone'),
+            })
+            vals['partner_id'] = partner.id
+        
+        if 'first_membership_date' not in vals:
+            vals['first_membership_date'] = fields.Date.today()
+        
+        return super(AssociationMember, self).create(vals)
 

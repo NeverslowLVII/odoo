@@ -6,11 +6,12 @@
     'depends': ['base', 'mail', 'account'],
     'data': [
         'security/ir.model.access.csv',
-        'data/mail_template.xml',
         'views/member_views.xml',
         'views/event_views.xml',
         'views/dashboard_views.xml',
         'views/receipt_views.xml',
+        'views/account_move_views.xml',
+        'data/mail_template.xml',
     ],
     'installable': True,
     'application': True,
@@ -21,5 +22,6 @@
         'tests/test_event.py',
         'tests/test_receipt.py',
         'tests/test_views.py',
+        'tests/test_statistics.py',
     ],
 }

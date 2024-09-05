@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_event_report_tree" model="ir.ui.view">
+        <field name="name">association.event.report.tree</field>
+        <field name="model">association.event.report</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="event_id"/>
+                <field name="participant_count"/>
+                <field name="revenue"/>
+                <field name="cost"/>
+                <field name="profit"/>
+                <field name="year"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_event_report" model="ir.actions.act_window">
+        <field name="name">Rapport des événements</field>
+        <field name="res_model">association.event.report</field>
+        <field name="view_mode">tree,graph</field>
+    </record>
+
+    <menuitem id="menu_event_report" name="Rapport des événements" parent="menu_association_root" action="action_event_report"/>
+</odoo>
