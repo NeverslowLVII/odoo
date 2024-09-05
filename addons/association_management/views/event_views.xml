@@ -9,6 +9,9 @@
                 <field name="date"/>
                 <field name="max_participants"/>
                 <field name="participant_count"/>
+                <field name="cost"/>
+                <field name="revenue"/>
+                <field name="profit"/>
                 <field name="state"/>
             </tree>
         </field>
@@ -20,25 +23,23 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_confirm" string="Confirm" type="object" invisible="state != 'draft'" class="oe_highlight"/>
-                    <button name="action_done" string="Mark as Done" type="object" invisible="state != 'confirmed'" class="oe_highlight"/>
-                    <button name="action_cancel" string="Cancel" type="object" invisible="state not in ('draft', 'confirmed')"/>
+                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_done" string="Mark as Done" type="object" class="oe_highlight" invisible="state != 'confirmed'"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state in ('cancelled', 'done')"/>
                     <button name="action_draft" string="Set to Draft" type="object" invisible="state != 'cancelled'"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
+                    <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
-                    <div class="oe_title">
-                        <h1>
-                            <field name="name" placeholder="Event Name"/>
-                        </h1>
-                    </div>
                     <group>
                         <group>
+                            <field name="name"/>
                             <field name="date"/>
                             <field name="max_participants"/>
                         </group>
                         <group>
-                            <field name="participant_count"/>
+                            <field name="cost"/>
+                            <field name="revenue"/>
+                            <field name="profit"/>
                         </group>
                     </group>
                     <notebook>

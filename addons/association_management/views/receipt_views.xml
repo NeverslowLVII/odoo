@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_association_receipt_form" model="ir.ui.view">
+        <field name="name">association.receipt.form</field>
+        <field name="model">association.receipt</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_validate" string="Validate" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state not in ('draft', 'validated')"/>
+                    <button name="action_draft" string="Set to Draft" type="object" invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="amount"/>
+                            <field name="event_id"/>
+                        </group>
+                        <group>
+                            <field name="image" widget="image"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_association_receipt_tree" model="ir.ui.view">
+        <field name="name">association.receipt.tree</field>
+        <field name="model">association.receipt</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="date"/>
+                <field name="amount"/>
+                <field name="event_id"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_association_receipts" model="ir.actions.act_window">
+        <field name="name">Receipts</field>
+        <field name="res_model">association.receipt</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_association_receipts" name="Receipts" parent="menu_association_root" action="action_association_receipts" sequence="30"/>
+</odoo>

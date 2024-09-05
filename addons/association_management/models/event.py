@@ -17,12 +17,21 @@ class AssociationEvent(models.Model):
         ('cancelled', 'Cancelled')
     ], string='Status', default='draft', tracking=True)
 
+    cost = fields.Float(string='Cost', tracking=True)
+    revenue = fields.Float(string='Revenue', tracking=True)
+    profit = fields.Float(string='Profit', compute='_compute_profit', store=True)
+
     @api.depends('participant_ids')
     def _compute_participant_count(self):
         for event in self:
             event.participant_count = len(event.participant_ids)
 
     participant_count = fields.Integer(string='Participant Count', compute='_compute_participant_count', store=True)
+
+    @api.depends('cost', 'revenue')
+    def _compute_profit(self):
+        for event in self:
+            event.profit = event.revenue - event.cost
 
     def action_confirm(self):
         self.state = 'confirmed'

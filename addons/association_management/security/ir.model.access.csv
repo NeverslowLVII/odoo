@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_association_member,access_association_member,model_association_member,base.group_user,1,1,1,1
 access_association_event,access_association_event,model_association_event,base.group_user,1,1,1,1
+access_association_statistics,access_association_statistics,model_association_statistics,base.group_user,1,0,0,0
+access_association_receipt,access_association_receipt,model_association_receipt,base.group_user,1,1,1,1

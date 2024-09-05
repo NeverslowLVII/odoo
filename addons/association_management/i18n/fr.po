@@ -219,3 +219,121 @@ msgstr "Annuler"
 #: model_terms:ir.ui.view,arch_db:association_management.view_association_event_form
 msgid "Set to Draft"
 msgstr "Mettre en brouillon"
+
+#. module: association_management
+#: model:ir.actions.act_window,name:association_management.action_association_dashboard
+#: model:ir.ui.menu,name:association_management.menu_association_dashboard
+msgid "Association Dashboard"
+msgstr "Tableau de bord de l'association"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_statistics__total_members
+msgid "Total Members"
+msgstr "Nombre total de membres"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_statistics__active_members
+msgid "Active Members"
+msgstr "Membres actifs"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_statistics__new_members_this_month
+msgid "New Members This Month"
+msgstr "Nouveaux membres ce mois-ci"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_statistics__total_events
+msgid "Total Events"
+msgstr "Nombre total d'événements"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_statistics__upcoming_events
+msgid "Upcoming Events"
+msgstr "Événements à venir"
+
+#. module: association_management
+#: model:ir.ui.view,arch_db:association_management.view_association_dashboard
+msgid "Total Members"
+msgstr "Nombre total de membres"
+
+#. module: association_management
+#: model:ir.ui.view,arch_db:association_management.view_association_dashboard
+msgid "Active Members"
+msgstr "Membres actifs"
+
+#. module: association_management
+#: model:ir.ui.view,arch_db:association_management.view_association_dashboard
+msgid "New Members This Month"
+msgstr "Nouveaux membres ce mois-ci"
+
+#. module: association_management
+#: model:ir.ui.view,arch_db:association_management.view_association_dashboard
+msgid "Total Events"
+msgstr "Nombre total d'événements"
+
+#. module: association_management
+#: model:ir.ui.view,arch_db:association_management.view_association_dashboard
+msgid "Upcoming Events"
+msgstr "Événements à venir"
+
+#. module: association_management
+#: model:ir.actions.act_window,name:association_management.action_association_dashboard
+#: model:ir.ui.menu,name:association_management.menu_association_dashboard
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_event__cost
+msgid "Cost"
+msgstr "Coût"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_event__revenue
+msgid "Revenue"
+msgstr "Recette"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_event__profit
+msgid "Profit"
+msgstr "Bénéfice"
+
+#. module: association_management
+#: model:ir.model,name:association_management.model_association_receipt
+msgid "Association Receipt"
+msgstr "Reçu de l'association"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_receipt__name
+msgid "Receipt Number"
+msgstr "Numéro de reçu"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_receipt__date
+msgid "Receipt Date"
+msgstr "Date du reçu"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_receipt__amount
+msgid "Amount"
+msgstr "Montant"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_receipt__image
+msgid "Scanned Image"
+msgstr "Image scannée"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_receipt__event_id
+msgid "Related Event"
+msgstr "Événement associé"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_receipt__state
+msgid "Status"
+msgstr "Statut"
+
+#. module: association_management
+#: model:ir.actions.act_window,name:association_management.action_association_receipts
+#: model:ir.ui.menu,name:association_management.menu_association_receipts
+msgid "Receipts"
+msgstr "Reçus"
