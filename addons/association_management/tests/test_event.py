@@ -7,12 +7,12 @@ class TestAssociationEvent(TransactionCase):
         super(TestAssociationEvent, self).setUp()
         self.Event = self.env['association.event']
 
-    def test_create_event(self):
-        event = self.Event.create({
-            'name': 'Test Event',
+    def test_creer_evenement(self):
+        evenement = self.Event.create({
+            'name': 'Événement Test',
             'date': '2023-12-31',
             'max_participants': 100,
         })
-        self.assertEqual(event.name, 'Test Event')
-        self.assertEqual(event.date, Date.from_string('2023-12-31'))
-        self.assertEqual(event.max_participants, 100)
+        self.assertEqual(evenement.name, 'Événement Test')
+        self.assertEqual(evenement.date, Date.from_string('2023-12-31'))
+        self.assertEqual(evenement.max_participants, 100)

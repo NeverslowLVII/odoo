@@ -3,30 +3,31 @@ from odoo.exceptions import UserError
 
 class AssociationReceipt(models.Model):
     _name = 'association.receipt'
-    _description = 'Association Receipt'
+    _description = 'Reçu d\'association'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char(string='Receipt Number', required=True, copy=False, readonly=True, default='New')
-    date = fields.Date(string='Receipt Date', required=True, default=fields.Date.context_today)
-    amount = fields.Float(string='Amount', required=True)
-    image = fields.Binary(string='Scanned Image', attachment=True)
-    event_id = fields.Many2one('association.event', string='Related Event')
+    name = fields.Char(string='Numéro de reçu', required=True, copy=False, readonly=True, default='New')
+    date = fields.Date(string='Date de reçu', required=True, default=fields.Date.context_today)
+    amount = fields.Float(string='Montant', required=True)
+    image = fields.Binary(string='Image scannée', attachment=True)
+    event_id = fields.Many2one('association.event', string='Événement associé')
     state = fields.Selection([
-        ('draft', 'Draft'),
-        ('validated', 'Validated'),
-        ('cancelled', 'Cancelled')
-    ], string='Status', default='draft', tracking=True)
+        ('draft', 'Brouillon'),
+        ('validated', 'Validé'),
+        ('cancelled', 'Annulé')
+    ], string='Statut', default='draft', tracking=True)
 
-    @api.model
-    def create(self, vals):
-        if vals.get('name', 'New') == 'New':
-            vals['name'] = self.env['ir.sequence'].next_by_code('association.receipt') or 'New'
-        return super(AssociationReceipt, self).create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', 'New') == 'New':
+                vals['name'] = self.env['ir.sequence'].next_by_code('association.receipt') or 'New'
+        return super(AssociationReceipt, self).create(vals_list)
 
     def action_validate(self):
         for receipt in self:
             if not receipt.image:
-                raise UserError("Please upload a scanned image before validating.")
+                raise UserError("Veuillez télécharger une image scannée avant de valider.")
             receipt.state = 'validated'
 
     def action_cancel(self):

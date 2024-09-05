@@ -9,47 +9,47 @@ _logger = logging.getLogger(__name__)
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    association_member_ids = fields.One2many('association.member', 'partner_id', string='Association Members')
+    association_member_ids = fields.One2many('association.member', 'partner_id', string='Membres de l\'association')
 
 class AssociationMember(models.Model):
     _name = 'association.member'
-    _description = 'Association Member'
+    _description = 'Membre de l\'association'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'name'
 
-    name = fields.Char(string='Name', required=True, tracking=True)
+    name = fields.Char(string='Nom', required=True, tracking=True)
     email = fields.Char(string='Email', tracking=True)
-    phone = fields.Char(string='Phone', tracking=True)
-    join_date = fields.Date(string='Join Date', default=fields.Date.today, tracking=True)
-    is_active = fields.Boolean(string='Active', default=True, tracking=True)
+    phone = fields.Char(string='Téléphone', tracking=True)
+    join_date = fields.Date(string='Date d\'adhésion', default=fields.Date.today, tracking=True)
+    is_active = fields.Boolean(string='Actif', default=True, tracking=True)
     membership_type = fields.Selection([
-        ('regular', 'Regular'),
-        ('student', 'Student'),
+        ('regular', 'Régulier'),
+        ('student', 'Étudiant'),
         ('senior', 'Senior'),
-        ('honorary', 'Honorary')
-    ], string='Membership Type', default='regular', tracking=True)
-    birth_date = fields.Date(string='Birth Date')
-    age = fields.Integer(string='Age', compute='_compute_age', store=True)
+        ('honorary', 'Honoraire')
+    ], string='Type d\'adhésion', default='regular', tracking=True)
+    birth_date = fields.Date(string='Date de naissance')
+    age = fields.Integer(string='Âge', compute='_compute_age', store=True)
     notes = fields.Text(string='Notes')
     
-    membership_start = fields.Date(string='Membership Start', default=fields.Date.today, tracking=True)
-    membership_end = fields.Date(string='Membership End', compute='_compute_membership_end', store=True)
+    membership_start = fields.Date(string='Début de l\'adhésion', default=fields.Date.today, tracking=True)
+    membership_end = fields.Date(string='Fin de l\'adhésion', compute='_compute_membership_end', store=True)
     membership_state = fields.Selection([
-        ('draft', 'Draft'),
-        ('active', 'Active'),
-        ('expired', 'Expired'),
-        ('cancelled', 'Cancelled')
-    ], string='Membership State', default='draft', tracking=True)
+        ('draft', 'Brouillon'),
+        ('active', 'Actif'),
+        ('expired', 'Expiré'),
+        ('cancelled', 'Annulé')
+    ], string='État de l\'adhésion', default='draft', tracking=True)
     
-    partner_id = fields.Many2one('res.partner', string='Related Partner', ondelete='restrict')
+    partner_id = fields.Many2one('res.partner', string='Partenaire associé', ondelete='restrict')
 
     payment_state = fields.Selection([
-        ('unpaid', 'Unpaid'),
-        ('paid', 'Paid'),
-    ], string='Payment State', default='unpaid', tracking=True)
+        ('unpaid', 'Non payé'),
+        ('paid', 'Payé'),
+    ], string='État du paiement', default='unpaid', tracking=True)
     
-    is_renewal = fields.Boolean(string='Is Renewal', compute='_compute_is_renewal', store=True)
-    renewal_alert = fields.Boolean(string='Renewal Alert', default=False)
+    is_renewal = fields.Boolean(string='Renouvellement', compute='_compute_is_renewal', store=True)
+    renewal_alert = fields.Boolean(string='Alerte de renouvellement', default=False)
 
     @api.depends('birth_date')
     def _compute_age(self):
@@ -91,23 +91,24 @@ class AssociationMember(models.Model):
                     user_id=self.env.user.id
                 )
 
-    @api.model
-    def create(self, vals):
-        partner = self.env['res.partner'].search([
-            '|', ('email', '=', vals.get('email')),
-            '&', ('name', '=', vals.get('name')),
-            ('phone', '=', vals.get('phone'))
-        ], limit=1)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            partner = self.env['res.partner'].search([
+                '|', ('email', '=', vals.get('email')),
+                '&', ('name', '=', vals.get('name')),
+                ('phone', '=', vals.get('phone'))
+            ], limit=1)
 
-        if not partner:
-            partner = self.env['res.partner'].create({
-                'name': vals.get('name'),
-                'email': vals.get('email'),
-                'phone': vals.get('phone'),
-            })
-        
-        vals['partner_id'] = partner.id
-        return super(AssociationMember, self).create(vals)
+            if not partner:
+                partner = self.env['res.partner'].create({
+                    'name': vals.get('name'),
+                    'email': vals.get('email'),
+                    'phone': vals.get('phone'),
+                })
+            
+            vals['partner_id'] = partner.id
+        return super(AssociationMember, self).create(vals_list)
 
     def unlink(self):
         partners = self.mapped('partner_id')
@@ -123,7 +124,52 @@ class AssociationMember(models.Model):
     def action_mark_as_paid(self):
         for member in self:
             member.payment_state = 'paid'
+            invoice = self._create_invoice(member)
+            self._send_welcome_email(member, invoice)
             self.action_activate_membership()
+
+    def _create_invoice(self, member):
+        invoice = self.env['account.move'].create({
+            'partner_id': member.partner_id.id,
+            'move_type': 'out_invoice',
+            'invoice_date': fields.Date.today(),
+            'invoice_line_ids': [(0, 0, {
+                'name': f'Cotisation - {member.membership_type}',
+                'quantity': 1,
+                'price_unit': self._get_membership_price(member.membership_type),
+            })],
+        })
+        invoice.action_post()
+        self._mark_invoice_as_paid(invoice)
+        return invoice
+
+    def _mark_invoice_as_paid(self, invoice):
+        # Marquer la facture comme payée
+        invoice.payment_state = 'paid'
+        invoice.amount_residual = 0
+        invoice.amount_residual_signed = 0
+        
+        # Créer une écriture comptable pour le paiement
+        journal = self.env['account.journal'].search([('type', '=', 'bank')], limit=1)
+        payment = self.env['account.payment'].create({
+            'partner_type': 'customer',
+            'payment_type': 'inbound',
+            'partner_id': invoice.partner_id.id,
+            'amount': invoice.amount_total,
+            'journal_id': journal.id,
+            'date': fields.Date.today(),
+        })
+        payment.action_post()
+        
+        # Réconcilier le paiement avec la facture
+        lines_to_reconcile = (payment.move_id.line_ids + invoice.line_ids).filtered(
+            lambda line: line.account_id.internal_type in ('receivable', 'payable')
+        )
+        lines_to_reconcile.reconcile()
+
+    def _send_welcome_email(self, member, invoice):
+        template = self.env.ref('association_management.email_template_welcome_member')
+        template.send_mail(member.id, force_send=True)
 
     def action_activate_membership(self):
         for member in self:
@@ -135,83 +181,6 @@ class AssociationMember(models.Model):
             else:
                 raise UserError(_("Le paiement doit être effectué avant d'activer l'adhésion."))
 
-    def _create_invoice(self, member):
-        invoice = self.env['account.move'].create({
-            'partner_id': member.partner_id.id,
-            'move_type': 'out_invoice',
-            'invoice_date': fields.Date.today(),
-            'invoice_line_ids': [(0, 0, {
-                'name': f'Membership fee - {member.membership_type}',
-                'quantity': 1,
-                'price_unit': self._get_membership_price(member.membership_type),
-            })],
-        })
-        invoice.action_post()
-        self._mark_invoice_as_paid(invoice)
-        return invoice
-
-    def _mark_invoice_as_paid(self, invoice):
-        # Marquer la facture comme payée sans créer de paiement
-        invoice.payment_state = 'paid'
-        invoice.amount_residual = 0
-        invoice.amount_residual_signed = 0
-        
-        # Créer une écriture comptable pour équilibrer la facture
-        journal = self.env['account.journal'].search([('type', '=', 'bank')], limit=1)
-        
-        # Trouver le compte client (receivable account)
-        receivable_line = invoice.line_ids.filtered(lambda l: l.account_id.internal_group == 'asset' and l.account_id.reconcile)
-        if not receivable_line:
-            raise UserError(_("Impossible de trouver le compte client pour cette facture."))
-        
-        move_lines = [
-            (0, 0, {
-                'account_id': receivable_line[0].account_id.id,
-                'partner_id': invoice.partner_id.id,
-                'debit': 0,
-                'credit': invoice.amount_total,
-                'name': f'Payment for invoice {invoice.name}',
-            }),
-            (0, 0, {
-                'account_id': journal.default_account_id.id,
-                'partner_id': invoice.partner_id.id,
-                'debit': invoice.amount_total,
-                'credit': 0,
-                'name': f'Payment for invoice {invoice.name}',
-            })
-        ]
-        
-        payment_move = self.env['account.move'].create({
-            'journal_id': journal.id,
-            'date': fields.Date.today(),
-            'ref': f'Payment for invoice {invoice.name}',
-            'line_ids': move_lines,
-        })
-        payment_move.action_post()
-
-        # Réconcilier les écritures
-        lines_to_reconcile = (payment_move.line_ids + invoice.line_ids).filtered(
-            lambda line: line.account_id.internal_group == 'asset' and line.account_id.reconcile
-        )
-        lines_to_reconcile.reconcile()
-
-    def _send_welcome_message(self, member, invoice):
-        member.message_post(
-            body=f"""
-            <p>Cher(e) {member.name},</p>
-            <p>Nous sommes ravis de vous accueillir en tant que nouveau membre de notre association.</p>
-            <p>Votre adhésion a été activée avec succès.</p>
-            <p>Cordialement,<br/>L'équipe de l'association</p>
-            """,
-            subject="Bienvenue à l'association",
-            message_type='comment',
-            subtype_xmlid='mail.mt_note',
-        )
-
-        _logger.info(f"Message de bienvenue créé pour le membre {member.name}")
-        if invoice:
-            _logger.info(f"Facture créée pour le membre {member.name}: {invoice.name}")
-
     def _get_membership_price(self, membership_type):
         prices = {
             'regular': 100,
@@ -220,3 +189,4 @@ class AssociationMember(models.Model):
             'honorary': 0,
         }
         return prices.get(membership_type, 0)
+

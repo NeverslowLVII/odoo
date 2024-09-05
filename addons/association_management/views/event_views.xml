@@ -23,10 +23,10 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" invisible="state != 'draft'"/>
-                    <button name="action_done" string="Mark as Done" type="object" class="oe_highlight" invisible="state != 'confirmed'"/>
-                    <button name="action_cancel" string="Cancel" type="object" invisible="state in ('cancelled', 'done')"/>
-                    <button name="action_draft" string="Set to Draft" type="object" invisible="state != 'cancelled'"/>
+                    <button name="action_confirm" string="Confirmer" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_done" string="Marquer comme Terminé" type="object" class="oe_highlight" invisible="state != 'confirmed'"/>
+                    <button name="action_cancel" string="Annuler" type="object" invisible="state in ('cancelled', 'done')"/>
+                    <button name="action_draft" string="Revenir à Brouillon" type="object" invisible="state != 'cancelled'"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
@@ -61,10 +61,10 @@
     </record>
 
     <record id="action_association_events" model="ir.actions.act_window">
-        <field name="name">Events</field>
+        <field name="name">Événements</field>
         <field name="res_model">association.event</field>
         <field name="view_mode">tree,form</field>
     </record>
 
-    <menuitem id="menu_association_events" name="Events" parent="menu_association_root" action="action_association_events"/>
+    <menuitem id="menu_association_events" name="Événements" parent="menu_association_root" action="action_association_events"/>
 </odoo>

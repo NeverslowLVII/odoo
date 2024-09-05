@@ -2,14 +2,14 @@ from odoo import models, fields, api, tools
 
 class AssociationStatistics(models.Model):
     _name = 'association.statistics'
-    _description = 'Association Statistics'
+    _description = 'Statistiques de l\'association'
     _auto = False
 
-    total_members = fields.Integer(string='Total Members')
-    active_members = fields.Integer(string='Active Members')
-    new_members_this_month = fields.Integer(string='New Members This Month')
-    total_events = fields.Integer(string='Total Events')
-    upcoming_events = fields.Integer(string='Upcoming Events')
+    total_members = fields.Integer(string='Nombre total de membres')
+    active_members = fields.Integer(string='Membres actifs')
+    new_members_this_month = fields.Integer(string='Nouveaux membres ce mois-ci')
+    total_events = fields.Integer(string='Nombre total d\'événements')
+    upcoming_events = fields.Integer(string='Événements à venir')
 
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)

@@ -28,7 +28,7 @@
                 <sheet>
                     <div class="oe_title">
                         <h1>
-                            <field name="name" placeholder="Member Name"/>
+                            <field name="name" placeholder="Nom du membre"/>
                         </h1>
                     </div>
                     <group>
@@ -102,7 +102,7 @@
     </record>
 
     <record id="action_association_members" model="ir.actions.act_window">
-        <field name="name">Members</field>
+        <field name="name">Membres</field>
         <field name="res_model">association.member</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'search_default_active': 1}</field>
@@ -116,11 +116,11 @@
                 <field name="name"/>
                 <field name="email"/>
                 <field name="phone"/>
-                <filter string="Active" name="active" domain="[('is_active', '=', True)]"/>
-                <filter string="Inactive" name="inactive" domain="[('is_active', '=', False)]"/>
-                <group expand="0" string="Group By">
-                    <filter string="Membership Type" name="group_by_membership_type" context="{'group_by': 'membership_type'}"/>
-                    <filter string="Join Date" name="group_by_join_date" context="{'group_by': 'join_date'}"/>
+                <filter string="Actif" name="active" domain="[('is_active', '=', True)]"/>
+                <filter string="Inactif" name="inactive" domain="[('is_active', '=', False)]"/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Type d'adhésion" name="group_by_membership_type" context="{'group_by': 'membership_type'}"/>
+                    <filter string="Date d'adhésion" name="group_by_join_date" context="{'group_by': 'join_date'}"/>
                 </group>
             </search>
         </field>

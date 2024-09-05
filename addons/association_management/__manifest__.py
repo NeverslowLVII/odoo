@@ -1,8 +1,8 @@
 {
-    'name': 'Association Management',
+    'name': 'Gestion d\'Association',
     'version': '1.0',
     'category': 'Associations',
-    'summary': 'Manage association members and events',
+    'summary': 'Gérer les membres et les événements de l\'association',
     'depends': ['base', 'mail', 'account'],
     'data': [
         'security/ir.model.access.csv',

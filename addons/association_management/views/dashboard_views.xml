@@ -15,25 +15,25 @@
                         <div class="oe_kanban_global_click container">
                             <div class="row">
                                 <div class="col-4 o_kanban_card_content">
-                                    <strong>Total Members</strong>
+                                    <strong>Membres Totals</strong>
                                     <h2><field name="total_members"/></h2>
                                 </div>
                                 <div class="col-4 o_kanban_card_content">
-                                    <strong>Active Members</strong>
+                                    <strong>Membres Actifs</strong>
                                     <h2><field name="active_members"/></h2>
                                 </div>
                                 <div class="col-4 o_kanban_card_content">
-                                    <strong>New Members This Month</strong>
+                                    <strong>Nouveaux Membres Ce Mois</strong>
                                     <h2><field name="new_members_this_month"/></h2>
                                 </div>
                             </div>
                             <div class="row mt-3">
                                 <div class="col-6 o_kanban_card_content">
-                                    <strong>Total Events</strong>
+                                    <strong>Événements Totals</strong>
                                     <h2><field name="total_events"/></h2>
                                 </div>
                                 <div class="col-6 o_kanban_card_content">
-                                    <strong>Upcoming Events</strong>
+                                    <strong>Événements À Venir</strong>
                                     <h2><field name="upcoming_events"/></h2>
                                 </div>
                             </div>
@@ -45,10 +45,10 @@
     </record>
 
     <record id="action_association_dashboard" model="ir.actions.act_window">
-        <field name="name">Association Dashboard</field>
+        <field name="name">Tableau de Bord de l'Association</field>
         <field name="res_model">association.statistics</field>
         <field name="view_mode">kanban</field>
     </record>
 
-    <menuitem id="menu_association_dashboard" name="Dashboard" parent="menu_association_root" action="action_association_dashboard" sequence="1"/>
+    <menuitem id="menu_association_dashboard" name="Tableau de Bord" parent="menu_association_root" action="action_association_dashboard" sequence="1"/>
 </odoo>

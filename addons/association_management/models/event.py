@@ -2,23 +2,23 @@ from odoo import models, fields, api
 
 class AssociationEvent(models.Model):
     _name = 'association.event'
-    _description = 'Association Event'
+    _description = 'Événement de l\'association'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char(string='Event Name', required=True, tracking=True)
-    date = fields.Date(string='Event Date', required=True, tracking=True)
+    name = fields.Char(string='Nom de l\'événement', required=True, tracking=True)
+    date = fields.Date(string='Date de l\'événement', required=True, tracking=True)
     description = fields.Text(string='Description')
-    max_participants = fields.Integer(string='Maximum Participants', default=0)
+    max_participants = fields.Integer(string='Nombre maximum de participants', default=0)
     participant_ids = fields.Many2many('association.member', string='Participants')
     state = fields.Selection([
-        ('draft', 'Draft'),
-        ('confirmed', 'Confirmed'),
-        ('done', 'Done'),
-        ('cancelled', 'Cancelled')
-    ], string='Status', default='draft', tracking=True)
+        ('draft', 'Brouillon'),
+        ('confirmed', 'Confirmé'),
+        ('done', 'Terminé'),
+        ('cancelled', 'Annulé')
+    ], string='Statut', default='draft', tracking=True)
 
-    cost = fields.Float(string='Cost', tracking=True)
-    revenue = fields.Float(string='Revenue', tracking=True)
+    cost = fields.Float(string='Coût', tracking=True)
+    revenue = fields.Float(string='Revenu', tracking=True)
     profit = fields.Float(string='Profit', compute='_compute_profit', store=True)
 
     @api.depends('participant_ids')
@@ -26,7 +26,7 @@ class AssociationEvent(models.Model):
         for event in self:
             event.participant_count = len(event.participant_ids)
 
-    participant_count = fields.Integer(string='Participant Count', compute='_compute_participant_count', store=True)
+    participant_count = fields.Integer(string='Nombre de participants', compute='_compute_participant_count', store=True)
 
     @api.depends('cost', 'revenue')
     def _compute_profit(self):
@@ -44,3 +44,23 @@ class AssociationEvent(models.Model):
 
     def action_draft(self):
         self.state = 'draft'
+
+    present_participant_ids = fields.Many2many('association.member', 
+        'association_event_present_participants_rel', 
+        'event_id', 'member_id', 
+        string='Participants présents')
+
+    def action_mark_attendance(self):
+        return {
+            'name': 'Marquer la présence',
+            'view_mode': 'form',
+            'res_model': 'association.event.attendance.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'default_event_id': self.id, 'default_participant_ids': self.participant_ids.ids}
+        }
+
+    def send_thank_you_email(self):
+        template = self.env.ref('association_management.email_template_event_thank_you')
+        for participant in self.present_participant_ids:
+            template.send_mail(participant.id, force_send=True)

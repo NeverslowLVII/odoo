@@ -9,10 +9,10 @@ class TestAssociationReceipt(TransactionCase):
 
     def test_create_receipt(self):
         receipt = self.Receipt.create({
-            'name': 'Test Receipt',
+            'name': 'Reçu de Test',
             'date': '2023-12-31',
             'amount': 100.0,
         })
-        self.assertEqual(receipt.name, 'Test Receipt')
+        self.assertEqual(receipt.name, 'Reçu de Test')
         self.assertEqual(receipt.date, Date.from_string('2023-12-31'))
         self.assertEqual(receipt.amount, 100.0)
