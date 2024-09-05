@@ -1,0 +1,221 @@
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_member__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_member__email
+msgid "Email"
+msgstr "Courriel"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_member__join_date
+msgid "Join Date"
+msgstr "Date d'adhésion"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_member__phone
+msgid "Phone"
+msgstr "Téléphone"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_member__membership_type
+msgid "Membership Type"
+msgstr "Type d'adhésion"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_member__birth_date
+msgid "Birth Date"
+msgstr "Date de naissance"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_member__age
+msgid "Age"
+msgstr "Âge"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_member__notes
+msgid "Notes"
+msgstr "Notes"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_member__membership_start
+msgid "Membership Start"
+msgstr "Début d'adhésion"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_member__membership_end
+msgid "Membership End"
+msgstr "Fin d'adhésion"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_member__membership_state
+msgid "Membership State"
+msgstr "État de l'adhésion"
+
+#. module: association_management
+#: model:ir.model.fields.selection,name:association_management.selection__association_member__membership_state__draft
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: association_management
+#: model:ir.model.fields.selection,name:association_management.selection__association_member__membership_state__active
+msgid "Active"
+msgstr "Actif"
+
+#. module: association_management
+#: model:ir.model.fields.selection,name:association_management.selection__association_member__membership_state__expired
+msgid "Expired"
+msgstr "Expiré"
+
+#. module: association_management
+#: model:ir.model.fields.selection,name:association_management.selection__association_member__membership_state__cancelled
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. module: association_management
+#: model:ir.actions.act_window,name:association_management.action_association_members
+#: model:ir.ui.menu,name:association_management.menu_association_members
+msgid "Members"
+msgstr "Membres"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_member__partner_id
+msgid "Related Partner"
+msgstr "Partenaire associé"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_member__payment_state
+msgid "Payment State"
+msgstr "État du paiement"
+
+#. module: association_management
+#: model:ir.model.fields.selection,name:association_management.selection__association_member__payment_state__unpaid
+msgid "Unpaid"
+msgstr "Non payé"
+
+#. module: association_management
+#: model:ir.model.fields.selection,name:association_management.selection__association_member__payment_state__paid
+msgid "Paid"
+msgstr "Payé"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_member__is_renewal
+msgid "Is Renewal"
+msgstr "Est un renouvellement"
+
+#. module: association_management
+#: model:ir.model.fields.selection,name:association_management.selection__association_member__membership_type__regular
+msgid "Regular"
+msgstr "Régulier"
+
+#. module: association_management
+#: model:ir.model.fields.selection,name:association_management.selection__association_member__membership_type__student
+msgid "Student"
+msgstr "Étudiant"
+
+#. module: association_management
+#: model:ir.model.fields.selection,name:association_management.selection__association_member__membership_type__senior
+msgid "Senior"
+msgstr "Senior"
+
+#. module: association_management
+#: model:ir.model.fields.selection,name:association_management.selection__association_member__membership_type__honorary
+msgid "Honorary"
+msgstr "Honoraire"
+
+#. module: association_management
+#: model_terms:ir.ui.view,arch_db:association_management.view_association_member_form
+msgid "Activate Membership"
+msgstr "Activer l'adhésion"
+
+#. module: association_management
+#: model_terms:ir.ui.view,arch_db:association_management.view_association_member_form
+msgid "Member Name"
+msgstr "Nom du membre"
+
+#. module: association_management
+#: model_terms:ir.ui.view,arch_db:association_management.view_association_member_form
+msgid "Renewal"
+msgstr "Renouvellement"
+
+#. module: association_management
+#: model:ir.ui.menu,name:association_management.menu_association_root
+msgid "Association"
+msgstr "Association"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_member__is_active
+msgid "Active"
+msgstr "Actif"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_event__name
+msgid "Event Name"
+msgstr "Nom de l'événement"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_event__date
+msgid "Event Date"
+msgstr "Date de l'événement"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_event__description
+msgid "Description"
+msgstr "Description"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_event__max_participants
+msgid "Maximum Participants"
+msgstr "Nombre maximum de participants"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_event__participant_ids
+msgid "Participants"
+msgstr "Participants"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_event__state
+msgid "Status"
+msgstr "Statut"
+
+#. module: association_management
+#: model:ir.model.fields,field_description:association_management.field_association_event__participant_count
+msgid "Participant Count"
+msgstr "Nombre de participants"
+
+#. module: association_management
+#: model:ir.model.fields.selection,name:association_management.selection__association_event__state__confirmed
+msgid "Confirmed"
+msgstr "Confirmé"
+
+#. module: association_management
+#: model:ir.model.fields.selection,name:association_management.selection__association_event__state__done
+msgid "Done"
+msgstr "Terminé"
+
+#. module: association_management
+#: model:ir.actions.act_window,name:association_management.action_association_events
+#: model:ir.ui.menu,name:association_management.menu_association_events
+msgid "Events"
+msgstr "Événements"
+
+#. module: association_management
+#: model_terms:ir.ui.view,arch_db:association_management.view_association_event_form
+msgid "Confirm"
+msgstr "Confirmer"
+
+#. module: association_management
+#: model_terms:ir.ui.view,arch_db:association_management.view_association_event_form
+msgid "Mark as Done"
+msgstr "Marquer comme terminé"
+
+#. module: association_management
+#: model_terms:ir.ui.view,arch_db:association_management.view_association_event_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: association_management
+#: model_terms:ir.ui.view,arch_db:association_management.view_association_event_form
+msgid "Set to Draft"
+msgstr "Mettre en brouillon"
