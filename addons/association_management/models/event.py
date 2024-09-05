@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from datetime import timedelta
 
 class AssociationEvent(models.Model):
     _name = 'association.event'
@@ -95,3 +96,30 @@ class AssociationEvent(models.Model):
         elements.append(t)
         doc.build(elements)
         return doc
+
+    def action_send_registration_email(self):
+        self.ensure_one()
+        if self.env.context.get('test_template_id'):
+            template = self.env['mail.template'].browse(self.env.context['test_template_id'])
+        else:
+            template = self.env.ref('association_management.email_template_event_registration')
+        for participant in self.participant_ids:
+            template.send_mail(self.id, force_send=True)
+
+    def action_send_reminder_email(self):
+        self.ensure_one()
+        if self.env.context.get('test_template_id'):
+            template = self.env['mail.template'].browse(self.env.context['test_template_id'])
+        else:
+            template = self.env.ref('association_management.email_template_event_reminder')
+        for participant in self.participant_ids:
+            template.send_mail(self.id, force_send=True)
+
+    @api.model
+    def _cron_send_event_reminders(self):
+        events = self.search([
+            ('date', '=', fields.Date.today() + timedelta(days=2)),
+            ('state', '=', 'confirmed')
+        ])
+        for event in events:
+            event.action_send_reminder_email()

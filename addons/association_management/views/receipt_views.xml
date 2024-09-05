@@ -58,4 +58,20 @@
     </record>
 
     <menuitem id="menu_association_receipts" name="Reçus" parent="menu_association_root" action="action_association_receipts" sequence="30"/>
+
+    <record id="view_receipt_scan_wizard_form" model="ir.ui.view">
+        <field name="name">association.receipt.scan.wizard.form</field>
+        <field name="model">association.receipt.scan.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Scanner un reçu">
+                <group>
+                    <field name="scanned_image" widget="image"/>
+                </group>
+                <footer>
+                    <button name="action_attach_image" string="Attacher" type="object" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
 </odoo>

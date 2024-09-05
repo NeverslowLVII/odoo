@@ -53,6 +53,32 @@ class AssociationMember(models.Model):
 
     first_membership_date = fields.Date(string='Date de première adhésion', default=fields.Date.today)
 
+    payment_id = fields.Many2one('account.payment', string='Paiement associé')
+
+    def action_pay_online(self):
+        self.ensure_one()
+        return {
+            'name': 'Paiement en ligne',
+            'type': 'ir.actions.act_window',
+            'res_model': 'payment.transaction',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_amount': self._get_membership_price(self.membership_type),
+                'default_currency_id': self.env.company.currency_id.id,
+                'default_partner_id': self.partner_id.id,
+                'default_reference': f'MEMBER-{self.id}',
+            },
+        }
+
+    @api.model
+    def _handle_payment_success(self, payment):
+        member = self.search([('partner_id', '=', payment.partner_id.id)], limit=1)
+        if member:
+            member.payment_id = payment.id
+            member.payment_state = 'paid'
+            member.action_activate_membership()
+
     @api.depends('birth_date')
     def _compute_age(self):
         today = date.today()
@@ -143,12 +169,10 @@ class AssociationMember(models.Model):
         return invoice
 
     def _mark_invoice_as_paid(self, invoice):
-        # Marquer la facture comme payée
         invoice.payment_state = 'paid'
         invoice.amount_residual = 0
         invoice.amount_residual_signed = 0
         
-        # Créer une écriture comptable pour le paiement
         journal = self.env['account.journal'].search([('type', '=', 'bank')], limit=1)
         payment = self.env['account.payment'].create({
             'partner_type': 'customer',
@@ -160,9 +184,8 @@ class AssociationMember(models.Model):
         })
         payment.action_post()
         
-        # Réconcilier le paiement avec la facture
         lines_to_reconcile = (payment.move_id.line_ids + invoice.line_ids).filtered(
-            lambda line: line.account_id.internal_type in ('receivable', 'payable')
+            lambda line: line.account_id.account_type in ('asset_receivable', 'liability_payable')
         )
         lines_to_reconcile.reconcile()
 

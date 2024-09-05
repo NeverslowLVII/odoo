@@ -29,3 +29,20 @@ class TestAssociationReceipt(TransactionCase):
         receipt.image = base64.b64encode(b'fake_image_data')
         receipt.action_validate()
         self.assertEqual(receipt.state, 'validated')
+
+    def test_scan_receipt(self):
+        receipt = self.Receipt.create({
+            'name': 'R0003',
+            'date': '2023-01-03',
+            'amount': 300.0,
+        })
+        
+        # Simuler l'action de scan
+        wizard = self.env['association.receipt.scan.wizard'].create({
+            'receipt_id': receipt.id,
+            'scanned_image': base64.b64encode(b'fake_image_data'),
+        })
+        wizard.action_attach_image()
+        
+        self.assertTrue(receipt.scanned_image, "L'image scannée devrait être attachée au reçu")
+

@@ -40,6 +40,16 @@ class AssociationReceipt(models.Model):
         for receipt in self:
             receipt.state = 'draft'
 
+    def action_scan_receipt(self):
+        return {
+            'name': 'Scanner un reçu',
+            'type': 'ir.actions.act_window',
+            'res_model': 'association.receipt.scan.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_receipt_id': self.id},
+        }
+
     def attach_scanned_image(self, image_data):
         self.scanned_image = base64.b64encode(image_data)
 

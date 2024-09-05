@@ -35,3 +35,26 @@ class TestAssociationMember(TransactionCase):
         })
         self.assertEqual(member.first_membership_date, date.today())
 
+    def test_pay_online(self):
+        member = self.Member.create({
+            'name': 'Test Member',
+            'email': 'test@example.com',
+            'membership_type': 'regular',
+        })
+        
+        action = member.action_pay_online()
+        self.assertEqual(action['res_model'], 'payment.transaction')
+        self.assertEqual(action['context']['default_amount'], member._get_membership_price('regular'))
+        
+        # Simuler un paiement réussi
+        payment = self.env['account.payment'].create({
+            'partner_type': 'customer',
+            'payment_type': 'inbound',
+            'partner_id': member.partner_id.id,
+            'amount': member._get_membership_price('regular'),
+        })
+        self.Member._handle_payment_success(payment)
+        
+        self.assertEqual(member.payment_state, 'paid')
+        self.assertEqual(member.membership_state, 'active')
+

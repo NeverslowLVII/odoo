@@ -5,12 +5,12 @@
         <field name="model">association.member</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="name"/>
-                <field name="email"/>
-                <field name="phone"/>
-                <field name="membership_type"/>
-                <field name="join_date"/>
-                <field name="is_active"/>
+                <field name="name" />
+                <field name="email" />
+                <field name="phone" />
+                <field name="membership_type" />
+                <field name="join_date" />
+                <field name="is_active" />
             </tree>
         </field>
     </record>
@@ -21,32 +21,37 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_mark_as_paid" string="Marquer comme payé" type="object" class="oe_highlight" invisible="payment_state == 'paid'"/>
-                    <button name="action_activate_membership" string="Activer l'adhésion" type="object" class="oe_highlight" invisible="membership_state != 'draft' or payment_state != 'paid'"/>
-                    <field name="membership_state" widget="statusbar" options="{'clickable': '1'}"/>
+                    <button name="action_mark_as_paid" string="Marquer comme payé" type="object"
+                        invisible="payment_state == 'paid'" />
+                    <button name="action_activate_membership" string="Activer l'adhésion"
+                        type="object"
+                        invisible="membership_state != 'draft' or payment_state != 'paid'" />
+                    <button name="action_pay_online" string="Payer en ligne" type="object"
+                        invisible="payment_state == 'paid'" />
+                    <field name="membership_state" widget="statusbar" options="{'clickable': '1'}" />
                 </header>
                 <sheet>
                     <div class="oe_title">
                         <h1>
-                            <field name="name" placeholder="Nom du membre"/>
+                            <field name="name" placeholder="Nom du membre" />
                         </h1>
                     </div>
                     <group>
                         <group>
-                            <field name="email"/>
-                            <field name="phone"/>
-                            <field name="membership_type"/>
-                            <field name="join_date"/>
-                            <field name="partner_id"/>
-                            <field name="payment_state"/>
-                            <field name="is_renewal"/>
-                            <field name="renewal_alert" invisible="1"/>
+                            <field name="email" />
+                            <field name="phone" />
+                            <field name="membership_type" />
+                            <field name="join_date" />
+                            <field name="partner_id" />
+                            <field name="payment_state" />
+                            <field name="is_renewal" />
+                            <field name="renewal_alert" invisible="1" />
                         </group>
                         <group>
-                            <field name="membership_start"/>
-                            <field name="membership_end"/>
-                            <field name="birth_date"/>
-                            <field name="age"/>
+                            <field name="membership_start" />
+                            <field name="membership_end" />
+                            <field name="birth_date" />
+                            <field name="age" />
                         </group>
                     </group>
                     <div class="alert alert-info" role="alert" invisible="not renewal_alert">
@@ -54,14 +59,14 @@
                     </div>
                     <notebook>
                         <page string="Notes">
-                            <field name="notes"/>
+                            <field name="notes" />
                         </page>
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers"/>
-                    <field name="activity_ids" widget="mail_activity"/>
-                    <field name="message_ids" widget="mail_thread"/>
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" widget="mail_thread" />
                 </div>
             </form>
         </field>
@@ -72,26 +77,26 @@
         <field name="model">association.member</field>
         <field name="arch" type="xml">
             <kanban>
-                <field name="id"/>
-                <field name="name"/>
-                <field name="email"/>
-                <field name="phone"/>
-                <field name="membership_type"/>
+                <field name="id" />
+                <field name="name" />
+                <field name="email" />
+                <field name="phone" />
+                <field name="membership_type" />
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <strong class="o_kanban_record_title">
-                                    <field name="name"/>
+                                    <field name="name" />
                                 </strong>
                                 <div>
-                                    <field name="email"/>
+                                    <field name="email" />
                                 </div>
                                 <div>
-                                    <field name="phone"/>
+                                    <field name="phone" />
                                 </div>
                                 <div>
-                                    <field name="membership_type"/>
+                                    <field name="membership_type" />
                                 </div>
                             </div>
                         </div>
@@ -113,19 +118,22 @@
         <field name="model">association.member</field>
         <field name="arch" type="xml">
             <search>
-                <field name="name"/>
-                <field name="email"/>
-                <field name="phone"/>
-                <filter string="Actif" name="active" domain="[('is_active', '=', True)]"/>
-                <filter string="Inactif" name="inactive" domain="[('is_active', '=', False)]"/>
+                <field name="name" />
+                <field name="email" />
+                <field name="phone" />
+                <filter string="Actif" name="active" domain="[('is_active', '=', True)]" />
+                <filter string="Inactif" name="inactive" domain="[('is_active', '=', False)]" />
                 <group expand="0" string="Grouper par">
-                    <filter string="Type d'adhésion" name="group_by_membership_type" context="{'group_by': 'membership_type'}"/>
-                    <filter string="Date d'adhésion" name="group_by_join_date" context="{'group_by': 'join_date'}"/>
+                    <filter string="Type d'adhésion" name="group_by_membership_type"
+                        context="{'group_by': 'membership_type'}" />
+                    <filter string="Date d'adhésion" name="group_by_join_date"
+                        context="{'group_by': 'join_date'}" />
                 </group>
             </search>
         </field>
     </record>
 
-    <menuitem id="menu_association_root" name="Association"/>
-    <menuitem id="menu_association_members" parent="menu_association_root" action="action_association_members"/>
+    <menuitem id="menu_association_root" name="Association" />
+    <menuitem id="menu_association_members" parent="menu_association_root"
+        action="action_association_members" />
 </odoo>

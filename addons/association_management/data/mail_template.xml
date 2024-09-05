@@ -22,5 +22,37 @@
             <field name="lang">{{ object.partner_id.lang }}</field>
             <field name="auto_delete" eval="True"/>
         </record>
+
+        <record id="email_template_event_registration" model="mail.template">
+            <field name="name">Confirmation d'inscription à l'événement</field>
+            <field name="model_id" ref="model_association_event"/>
+            <field name="subject">Confirmation d'inscription: {{ object.name }}</field>
+            <field name="email_from">{{ user.email_formatted }}</field>
+            <field name="email_to">{{ object.email }}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p>Cher(e) {{ object.name }},</p>
+                    <p>Votre inscription à l'événement "{{ object.name }}" est confirmée.</p>
+                    <p>Date: {{ object.date }}</p>
+                    <p>Nous avons hâte de vous y voir!</p>
+                </div>
+            </field>
+        </record>
+
+        <record id="email_template_event_reminder" model="mail.template">
+            <field name="name">Rappel d'événement</field>
+            <field name="model_id" ref="model_association_event"/>
+            <field name="subject">Rappel: {{ object.name }}</field>
+            <field name="email_from">{{ user.email_formatted }}</field>
+            <field name="email_to">{{ object.email }}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p>Cher(e) {{ object.name }},</p>
+                    <p>Nous vous rappelons que l'événement "{{ object.name }}" aura lieu dans 2 jours.</p>
+                    <p>Date: {{ object.date }}</p>
+                    <p>Nous avons hâte de vous y voir!</p>
+                </div>
+            </field>
+        </record>
     </data>
 </odoo>
