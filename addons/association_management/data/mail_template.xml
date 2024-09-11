@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
+        <!-- Modèle d'e-mail pour accueillir un nouveau membre -->
         <record id="email_template_welcome_member" model="mail.template">
             <field name="name">Email de bienvenue pour le nouveau membre</field>
             <field name="model_id" ref="model_association_member"/>
-            <field name="subject">Bienvenue à {{ object.name }}</field>
-            <field name="email_from">{{ user.email_formatted }}</field>
-            <field name="email_to">{{ object.email }}</field>
+            <field name="subject">Bienvenue à ${object.name}</field>
+            <field name="email_from">${user.email_formatted}</field>
+            <field name="email_to">${object.email}</field>
             <field name="body_html" type="html">
                 <div style="margin: 0px; padding: 0px;">
                     <p style="margin: 0px; padding: 0px; font-size: 13px;">
-                        Cher(e) {{ object.name }},<br/><br/>
+                        Cher(e) ${object.name or ''},<br/><br/>
                         Nous sommes ravis de vous accueillir en tant que nouveau membre de notre association.<br/>
                         Votre adhésion a été activée avec succès.<br/>
                         Vous trouverez ci-joint votre facture acquittée.<br/><br/>
@@ -19,40 +20,46 @@
                     </p>
                 </div>
             </field>
-            <field name="lang">{{ object.partner_id.lang }}</field>
+            <field name="lang">${object.partner_id.lang}</field>
             <field name="auto_delete" eval="True"/>
         </record>
 
+        <!-- Modèle d'e-mail pour confirmer l'inscription à un événement -->
         <record id="email_template_event_registration" model="mail.template">
-            <field name="name">Confirmation d'inscription à l'événement</field>
+            <field name="name">Event: Registration</field>
             <field name="model_id" ref="model_association_event"/>
-            <field name="subject">Confirmation d'inscription: {{ object.name }}</field>
-            <field name="email_from">{{ user.email_formatted }}</field>
-            <field name="email_to">{{ object.email }}</field>
+            <field name="subject">Registration Confirmation for ${ctx.get('event_name', '')}</field>
+            <field name="email_from">${user.email_formatted}</field>
+            <field name="email_to">${ctx.get('participant_email', '')}</field>
             <field name="body_html" type="html">
                 <div>
-                    <p>Cher(e) {{ object.name }},</p>
-                    <p>Votre inscription à l'événement "{{ object.name }}" est confirmée.</p>
-                    <p>Date: {{ object.date }}</p>
+                    <p>Cher(e) ${ctx.get('participant_name', '')},</p>
+                    <p>Votre inscription à l'événement "${ctx.get('event_name', '')}" est confirmée.</p>
+                    <p>Date: ${ctx.get('event_date', '')}</p>
                     <p>Nous avons hâte de vous y voir!</p>
+                    <p>Cordialement,<br/>${user.name}</p>
                 </div>
             </field>
+            <field name="lang">${object.env.user.lang}</field>
+            <field name="auto_delete" eval="True"/>
         </record>
 
+        <!-- Modèle d'e-mail pour rappeler un événement aux participants -->
         <record id="email_template_event_reminder" model="mail.template">
             <field name="name">Rappel d'événement</field>
             <field name="model_id" ref="model_association_event"/>
-            <field name="subject">Rappel: {{ object.name }}</field>
-            <field name="email_from">{{ user.email_formatted }}</field>
-            <field name="email_to">{{ object.email }}</field>
+            <field name="subject">Rappel: ${object.name or ''}</field>
+            <field name="email_from">${user.email_formatted}</field>
+            <field name="email_to">${object.get_participant_emails()}</field>
             <field name="body_html" type="html">
                 <div>
-                    <p>Cher(e) {{ object.name }},</p>
-                    <p>Nous vous rappelons que l'événement "{{ object.name }}" aura lieu dans 2 jours.</p>
-                    <p>Date: {{ object.date }}</p>
+                    <p>Cher(e) participant(e),</p>
+                    <p>Nous vous rappelons que l'événement "${object.name or ''}" aura lieu dans 2 jours.</p>
+                    <p>Date: ${object.date or ''}</p>
                     <p>Nous avons hâte de vous y voir!</p>
                 </div>
             </field>
+            <field name="lang">${object.participant_ids[:1].lang or user.lang}</field>
         </record>
     </data>
 </odoo>

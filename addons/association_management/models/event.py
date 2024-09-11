@@ -1,11 +1,14 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from datetime import timedelta
+from odoo.tools import config
+from odoo.exceptions import UserError
 
 class AssociationEvent(models.Model):
     _name = 'association.event'
-    _description = 'Événement de l\'association'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _description = 'Association Event'
 
+    # Définition des champs du modèle
     name = fields.Char(string='Nom de l\'événement', required=True, tracking=True)
     date = fields.Date(string='Date de l\'événement', required=True, tracking=True)
     description = fields.Text(string='Description')
@@ -22,6 +25,7 @@ class AssociationEvent(models.Model):
     revenue = fields.Float(string='Revenu', tracking=True)
     profit = fields.Float(string='Profit', compute='_compute_profit', store=True)
 
+    # Calcul du nombre de participants
     @api.depends('participant_ids')
     def _compute_participant_count(self):
         for event in self:
@@ -29,11 +33,13 @@ class AssociationEvent(models.Model):
 
     participant_count = fields.Integer(string='Nombre de participants', compute='_compute_participant_count', store=True)
 
+    # Calcul du profit
     @api.depends('cost', 'revenue')
     def _compute_profit(self):
         for event in self:
             event.profit = event.revenue - event.cost
 
+    # Actions pour changer l'état de l'événement
     def action_confirm(self):
         self.state = 'confirmed'
 
@@ -46,11 +52,13 @@ class AssociationEvent(models.Model):
     def action_draft(self):
         self.state = 'draft'
 
+    # Champ pour les participants présents
     present_participant_ids = fields.Many2many('association.member', 
         'association_event_present_participants_rel', 
         'event_id', 'member_id', 
         string='Participants présents')
 
+    # Action pour marquer la présence
     def action_mark_attendance(self):
         return {
             'name': 'Marquer la présence',
@@ -61,11 +69,13 @@ class AssociationEvent(models.Model):
             'context': {'default_event_id': self.id, 'default_participant_ids': self.participant_ids.ids}
         }
 
+    # Envoi d'un email de remerciement
     def send_thank_you_email(self):
         template = self.env.ref('association_management.email_template_event_thank_you')
         for participant in self.present_participant_ids:
             template.send_mail(participant.id, force_send=True)
 
+    # Génération d'étiquettes pour les participants
     def generate_participant_labels(self):
         try:
             from reportlab.graphics import shapes
@@ -97,15 +107,27 @@ class AssociationEvent(models.Model):
         doc.build(elements)
         return doc
 
+    # Action pour envoyer un email d'inscription
     def action_send_registration_email(self):
         self.ensure_one()
-        if self.env.context.get('test_template_id'):
-            template = self.env['mail.template'].browse(self.env.context['test_template_id'])
-        else:
-            template = self.env.ref('association_management.email_template_event_registration')
+        template = self.env.ref('association_management.email_template_event_registration')
         for participant in self.participant_ids:
-            template.send_mail(self.id, force_send=True)
+            template.with_context(
+                participant_name=participant.name,
+                participant_email=participant.email,
+                event_name=self.name,
+                event_date=self.date
+            ).send_mail(
+                self.id,
+                force_send=True,
+                email_values={
+                    'email_to': participant.email,
+                    'email_from': self.env.user.email_formatted,
+                }
+            )
+        return True
 
+    # Action pour envoyer un email de rappel
     def action_send_reminder_email(self):
         self.ensure_one()
         if self.env.context.get('test_template_id'):
@@ -115,6 +137,7 @@ class AssociationEvent(models.Model):
         for participant in self.participant_ids:
             template.send_mail(self.id, force_send=True)
 
+    # Cron pour envoyer des rappels automatiques
     @api.model
     def _cron_send_event_reminders(self):
         events = self.search([
@@ -123,3 +146,16 @@ class AssociationEvent(models.Model):
         ])
         for event in events:
             event.action_send_reminder_email()
+
+    # Méthode pour obtenir les emails des participants
+    def get_participant_emails(self):
+        return ','.join([p.email for p in self.participant_ids if p.email])
+
+    email = fields.Char(string='Email', compute='_compute_email')
+
+    # Calcul du champ email
+    @api.depends('participant_ids')
+    def _compute_email(self):
+        for event in self:
+            event.email = ', '.join(event.participant_ids.mapped('email'))
+

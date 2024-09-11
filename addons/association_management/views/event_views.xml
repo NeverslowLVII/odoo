@@ -1,70 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Vue en arbre pour les événements de l'association -->
     <record id="view_association_event_tree" model="ir.ui.view">
         <field name="name">association.event.tree</field>
         <field name="model">association.event</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="name"/>
-                <field name="date"/>
-                <field name="max_participants"/>
-                <field name="participant_count"/>
-                <field name="cost"/>
-                <field name="revenue"/>
-                <field name="profit"/>
-                <field name="state"/>
+                <field name="name" />
+                <field name="date" />
+                <!-- Ajoutez d'autres champs que vous souhaitez afficher dans la vue en arbre -->
             </tree>
         </field>
     </record>
 
+    <!-- Vue formulaire pour les événements de l'association -->
     <record id="view_association_event_form" model="ir.ui.view">
         <field name="name">association.event.form</field>
         <field name="model">association.event</field>
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_confirm" string="Confirmer" type="object" class="oe_highlight" invisible="state != 'draft'"/>
-                    <button name="action_done" string="Marquer comme Terminé" type="object" class="oe_highlight" invisible="state != 'confirmed'"/>
-                    <button name="action_cancel" string="Annuler" type="object" invisible="state in ('cancelled', 'done')"/>
-                    <button name="action_draft" string="Revenir à Brouillon" type="object" invisible="state != 'cancelled'"/>
-                    <field name="state" widget="statusbar"/>
+                    <!-- Boutons d'action pour gérer l'état de l'événement -->
+                    <button name="action_confirm" string="Confirmer" type="object"
+                        class="oe_highlight" invisible="state != 'draft'" />
+                    <button name="action_done" string="Marquer comme Terminé" type="object"
+                        class="oe_highlight" invisible="state != 'confirmed'" />
+                    <button name="action_cancel" string="Annuler" type="object"
+                        invisible="state in ('cancelled', 'done')" />
+                    <button name="action_draft" string="Revenir à Brouillon" type="object"
+                        invisible="state != 'cancelled'" />
+                    <field name="state" widget="statusbar" />
+                    <button name="action_send_registration_email" string="Envoyer l'e-mail d'inscription v2" type="object" class="oe_highlight"/>
                 </header>
                 <sheet>
+                    <!-- Groupe de champs principaux -->
                     <group>
-                        <group>
-                            <field name="name"/>
-                            <field name="date"/>
-                            <field name="max_participants"/>
-                        </group>
-                        <group>
-                            <field name="cost"/>
-                            <field name="revenue"/>
-                            <field name="profit"/>
-                        </group>
+                        <field name="name" />
+                        <field name="date" />
+                        <field name="max_participants" />
                     </group>
+                    <!-- Onglets pour la description et les participants -->
                     <notebook>
                         <page string="Description">
-                            <field name="description"/>
+                            <field name="description" />
                         </page>
                         <page string="Participants">
-                            <field name="participant_ids"/>
+                            <field name="participant_ids" />
                         </page>
                     </notebook>
                 </sheet>
+                <!-- Section pour les discussions et activités -->
                 <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers"/>
-                    <field name="activity_ids" widget="mail_activity"/>
-                    <field name="message_ids" widget="mail_thread"/>
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" widget="mail_thread" />
                 </div>
             </form>
         </field>
     </record>
 
+    <!-- Action pour afficher la liste des événements -->
     <record id="action_association_events" model="ir.actions.act_window">
-        <field name="name">Événements</field>
+        <field name="name">Events</field>
         <field name="res_model">association.event</field>
         <field name="view_mode">tree,form</field>
     </record>
 
-    <menuitem id="menu_association_events" name="Événements" parent="menu_association_root" action="action_association_events"/>
+    <!-- Action serveur pour tester l'envoi d'e-mails -->
+    <record id="action_test_email_sending" model="ir.actions.server">
+        <field name="name">Test Email Sending</field>
+        <field name="model_id" ref="model_association_event"/>
+        <field name="binding_model_id" ref="model_association_event"/>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_send_registration_email()
+else:
+    action = {
+        'type': 'ir.actions.client',
+        'tag': 'display_notification',
+        'params': {
+            'title': 'No Event Selected',
+            'message': 'Please select an event before testing email sending.',
+            'type': 'warning',
+        }
+    }
+        </field>
+    </record>
+
+    <!-- Élément de menu principal -->
+    <menuitem id="menu_association_root" name="Association"/>
+
+    <!-- Sous-menu pour les événements -->
+    <menuitem id="menu_association_events" name="Events" parent="menu_association_root" sequence="10"/>
+
+    <!-- Élément de menu pour la liste des événements -->
+    <menuitem id="menu_association_events_list" 
+              name="Events List" 
+              parent="menu_association_events" 
+              action="action_association_events" 
+              sequence="10"/>
+
+    <!-- Élément de menu pour tester l'envoi d'e-mails -->
+    <menuitem id="menu_test_email_sending"
+              name="Test Email Sending"
+              parent="menu_association_events"
+              action="action_test_email_sending"
+              sequence="20"/>
 </odoo>

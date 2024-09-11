@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Définition de la vue formulaire pour les reçus d'association -->
     <record id="view_association_receipt_form" model="ir.ui.view">
         <field name="name">association.receipt.form</field>
         <field name="model">association.receipt</field>
         <field name="arch" type="xml">
             <form>
+                <!-- En-tête avec boutons d'action et barre de statut -->
                 <header>
                     <button name="action_validate" string="Valider" type="object" class="oe_highlight" invisible="state != 'draft'"/>
                     <button name="action_cancel" string="Annuler" type="object" invisible="state not in ('draft', 'validated')"/>
@@ -12,11 +14,13 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
+                    <!-- Titre du formulaire -->
                     <div class="oe_title">
                         <h1>
                             <field name="name" readonly="1"/>
                         </h1>
                     </div>
+                    <!-- Groupes de champs -->
                     <group>
                         <group>
                             <field name="date"/>
@@ -28,6 +32,7 @@
                         </group>
                     </group>
                 </sheet>
+                <!-- Section de discussion (chatter) -->
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers"/>
                     <field name="activity_ids" widget="mail_activity"/>
@@ -37,6 +42,7 @@
         </field>
     </record>
 
+    <!-- Définition de la vue liste pour les reçus d'association -->
     <record id="view_association_receipt_tree" model="ir.ui.view">
         <field name="name">association.receipt.tree</field>
         <field name="model">association.receipt</field>
@@ -51,14 +57,17 @@
         </field>
     </record>
 
+    <!-- Définition de l'action pour afficher les reçus -->
     <record id="action_association_receipts" model="ir.actions.act_window">
         <field name="name">Reçus</field>
         <field name="res_model">association.receipt</field>
         <field name="view_mode">tree,form</field>
     </record>
 
+    <!-- Élément de menu pour accéder aux reçus -->
     <menuitem id="menu_association_receipts" name="Reçus" parent="menu_association_root" action="action_association_receipts" sequence="30"/>
 
+    <!-- Définition de la vue formulaire pour le wizard de scan de reçu -->
     <record id="view_receipt_scan_wizard_form" model="ir.ui.view">
         <field name="name">association.receipt.scan.wizard.form</field>
         <field name="model">association.receipt.scan.wizard</field>

@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Définition de la vue du tableau de bord de l'association -->
     <record id="view_association_dashboard" model="ir.ui.view">
         <field name="name">association.dashboard</field>
         <field name="model">association.statistics</field>
         <field name="arch" type="xml">
+            <!-- Vue Kanban pour le tableau de bord -->
             <kanban class="o_kanban_dashboard">
+                <!-- Définition des champs à utiliser dans la vue -->
                 <field name="total_members"/>
                 <field name="active_members"/>
                 <field name="new_members_this_month"/>
@@ -12,26 +15,34 @@
                 <field name="upcoming_events"/>
                 <templates>
                     <t t-name="kanban-box">
+                        <!-- Conteneur principal pour chaque carte Kanban -->
                         <div class="oe_kanban_global_click container">
+                            <!-- Première ligne : statistiques des membres -->
                             <div class="row">
+                                <!-- Nombre total de membres -->
                                 <div class="col-4 o_kanban_card_content">
                                     <strong>Membres Totals</strong>
                                     <h2><field name="total_members"/></h2>
                                 </div>
+                                <!-- Nombre de membres actifs -->
                                 <div class="col-4 o_kanban_card_content">
                                     <strong>Membres Actifs</strong>
                                     <h2><field name="active_members"/></h2>
                                 </div>
+                                <!-- Nouveaux membres ce mois-ci -->
                                 <div class="col-4 o_kanban_card_content">
                                     <strong>Nouveaux Membres Ce Mois</strong>
                                     <h2><field name="new_members_this_month"/></h2>
                                 </div>
                             </div>
+                            <!-- Deuxième ligne : statistiques des événements -->
                             <div class="row mt-3">
+                                <!-- Nombre total d'événements -->
                                 <div class="col-6 o_kanban_card_content">
                                     <strong>Événements Totals</strong>
                                     <h2><field name="total_events"/></h2>
                                 </div>
+                                <!-- Nombre d'événements à venir -->
                                 <div class="col-6 o_kanban_card_content">
                                     <strong>Événements À Venir</strong>
                                     <h2><field name="upcoming_events"/></h2>
@@ -44,11 +55,13 @@
         </field>
     </record>
 
+    <!-- Définition de l'action pour afficher le tableau de bord -->
     <record id="action_association_dashboard" model="ir.actions.act_window">
         <field name="name">Tableau de Bord de l'Association</field>
         <field name="res_model">association.statistics</field>
         <field name="view_mode">kanban</field>
     </record>
 
+    <!-- Création de l'élément de menu pour accéder au tableau de bord -->
     <menuitem id="menu_association_dashboard" name="Tableau de Bord" parent="menu_association_root" action="action_association_dashboard" sequence="1"/>
 </odoo>

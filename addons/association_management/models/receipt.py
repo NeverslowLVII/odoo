@@ -7,6 +7,7 @@ class AssociationReceipt(models.Model):
     _description = 'Reçu d\'association'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
+    # Définition des champs du modèle
     name = fields.Char(string='Numéro de reçu', required=True, copy=False, readonly=True, default='New')
     date = fields.Date(string='Date de reçu', required=True, default=fields.Date.context_today)
     amount = fields.Float(string='Montant', required=True)
@@ -21,26 +22,31 @@ class AssociationReceipt(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        # Génération automatique du numéro de reçu lors de la création
         for vals in vals_list:
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('association.receipt') or 'New'
         return super(AssociationReceipt, self).create(vals_list)
 
     def action_validate(self):
+        # Validation du reçu
         for receipt in self:
             if not receipt.image:
                 raise UserError("Veuillez télécharger une image scannée avant de valider.")
             receipt.state = 'validated'
 
     def action_cancel(self):
+        # Annulation du reçu
         for receipt in self:
             receipt.state = 'cancelled'
 
     def action_draft(self):
+        # Remise du reçu en brouillon
         for receipt in self:
             receipt.state = 'draft'
 
     def action_scan_receipt(self):
+        # Ouverture de l'assistant pour scanner un reçu
         return {
             'name': 'Scanner un reçu',
             'type': 'ir.actions.act_window',
@@ -51,5 +57,6 @@ class AssociationReceipt(models.Model):
         }
 
     def attach_scanned_image(self, image_data):
+        # Attachement de l'image scannée au reçu
         self.scanned_image = base64.b64encode(image_data)
 

@@ -5,6 +5,7 @@ class AssociationStatistics(models.Model):
     _description = 'Statistiques de l\'association'
     _auto = False
 
+    # Champs pour stocker les statistiques
     total_members = fields.Integer(string='Nombre total de membres')
     active_members = fields.Integer(string='Membres actifs')
     new_members_this_month = fields.Integer(string='Nouveaux membres ce mois-ci')
@@ -12,7 +13,10 @@ class AssociationStatistics(models.Model):
     upcoming_events = fields.Integer(string='Événements à venir')
 
     def init(self):
+        # Supprime la vue existante si elle existe
         tools.drop_view_if_exists(self.env.cr, self._table)
+        
+        # Crée ou remplace la vue avec les statistiques calculées
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
                 SELECT

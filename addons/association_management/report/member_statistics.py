@@ -1,3 +1,4 @@
+# Importation des modules nécessaires d'Odoo
 from odoo import models, fields, api, tools
 
 class MemberStatistics(models.Model):
@@ -5,12 +6,16 @@ class MemberStatistics(models.Model):
     _description = 'Statistiques des membres de l\'association'
     _auto = False
 
+    # Définition des champs du modèle
     member_id = fields.Many2one('association.member', string='Membre')
     event_count = fields.Integer(string='Nombre d\'événements')
     last_event_date = fields.Date(string='Date du dernier événement')
 
     def init(self):
+        # Suppression de la vue existante si elle existe
         tools.drop_view_if_exists(self.env.cr, self._table)
+        
+        # Création ou remplacement de la vue SQL
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
                 SELECT

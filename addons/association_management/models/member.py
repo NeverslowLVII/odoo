@@ -3,20 +3,24 @@ from odoo.exceptions import UserError
 from dateutil.relativedelta import relativedelta
 from datetime import date
 import logging
+from datetime import timedelta
 
+# Configuration du logger
 _logger = logging.getLogger(__name__)
 
+# Modèle ResPartner hérité pour ajouter la relation avec les membres de l'association
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     association_member_ids = fields.One2many('association.member', 'partner_id', string='Membres de l\'association')
 
+# Modèle principal pour les membres de l'association
 class AssociationMember(models.Model):
     _name = 'association.member'
-    _description = 'Membre de l\'association'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _order = 'name'
+    _description = 'Association Member'
 
+    # Champs de base pour les informations du membre
     name = fields.Char(string='Nom', required=True, tracking=True)
     email = fields.Char(string='Email', tracking=True)
     phone = fields.Char(string='Téléphone', tracking=True)
@@ -32,6 +36,7 @@ class AssociationMember(models.Model):
     age = fields.Integer(string='Âge', compute='_compute_age', store=True)
     notes = fields.Text(string='Notes')
     
+    # Champs liés à l'adhésion
     membership_start = fields.Date(string='Début de l\'adhésion', default=fields.Date.today, tracking=True)
     membership_end = fields.Date(string='Fin de l\'adhésion', compute='_compute_membership_end', store=True)
     membership_state = fields.Selection([
@@ -41,20 +46,26 @@ class AssociationMember(models.Model):
         ('cancelled', 'Annulé')
     ], string='État de l\'adhésion', default='draft', tracking=True)
     
+    # Relation avec le partenaire
     partner_id = fields.Many2one('res.partner', string='Partenaire associé', ondelete='restrict')
 
+    # Champs liés au paiement
     payment_state = fields.Selection([
         ('unpaid', 'Non payé'),
         ('paid', 'Payé'),
     ], string='État du paiement', default='unpaid', tracking=True)
     
+    # Champs pour le renouvellement
     is_renewal = fields.Boolean(string='Renouvellement', compute='_compute_is_renewal', store=True)
     renewal_alert = fields.Boolean(string='Alerte de renouvellement', default=False)
 
+    # Date de première adhésion
     first_membership_date = fields.Date(string='Date de première adhésion', default=fields.Date.today)
 
+    # Relation avec le paiement
     payment_id = fields.Many2one('account.payment', string='Paiement associé')
 
+    # Action pour le paiement en ligne
     def action_pay_online(self):
         self.ensure_one()
         return {
@@ -71,6 +82,7 @@ class AssociationMember(models.Model):
             },
         }
 
+    # Méthode pour gérer le succès du paiement
     @api.model
     def _handle_payment_success(self, payment):
         member = self.search([('partner_id', '=', payment.partner_id.id)], limit=1)
@@ -79,6 +91,7 @@ class AssociationMember(models.Model):
             member.payment_state = 'paid'
             member.action_activate_membership()
 
+    # Calcul de l'âge
     @api.depends('birth_date')
     def _compute_age(self):
         today = date.today()
@@ -88,21 +101,20 @@ class AssociationMember(models.Model):
             else:
                 member.age = 0
 
+    # Calcul de la date de fin d'adhésion
     @api.depends('membership_start', 'membership_type')
     def _compute_membership_end(self):
         for member in self:
-            if member.membership_start:
-                if member.membership_type == 'regular':
-                    member.membership_end = member.membership_start + relativedelta(years=1)
-                elif member.membership_type == 'student':
-                    member.membership_end = member.membership_start + relativedelta(months=6)
-                elif member.membership_type == 'senior':
-                    member.membership_end = member.membership_start + relativedelta(years=2)
-                elif member.membership_type == 'honorary':
-                    member.membership_end = False
+            if member.membership_type == 'regular':
+                member.membership_end = member.membership_start + timedelta(days=365)
+            elif member.membership_type == 'student':
+                member.membership_end = member.membership_start + timedelta(days=181)
+            elif member.membership_type == 'senior':
+                member.membership_end = member.membership_start + timedelta(days=730)
             else:
                 member.membership_end = False
 
+    # Calcul du statut de renouvellement
     @api.depends('join_date')
     def _compute_is_renewal(self):
         for member in self:
@@ -119,6 +131,7 @@ class AssociationMember(models.Model):
                     user_id=self.env.user.id
                 )
 
+    # Surcharge de la méthode de création pour gérer la création du partenaire associé
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -135,6 +148,7 @@ class AssociationMember(models.Model):
         
         return super(AssociationMember, self).create(vals_list)
 
+    # Surcharge de la méthode de suppression pour gérer la désactivation du partenaire
     def unlink(self):
         partners = self.mapped('partner_id')
 
@@ -146,13 +160,17 @@ class AssociationMember(models.Model):
         
         return res
 
+    # Action pour marquer le paiement comme effectué
     def action_mark_as_paid(self):
-        for member in self:
-            member.payment_state = 'paid'
-            invoice = self._create_invoice(member)
-            self._send_welcome_email(member, invoice)
-            self.action_activate_membership()
+        self.ensure_one()
+        if self.payment_state != 'paid':
+            self._create_invoice()
+            self.payment_state = 'paid'
+            self.membership_state = 'active'
+            self._send_welcome_email()
+        return True
 
+    # Création de la facture
     def _create_invoice(self, member):
         invoice = self.env['account.move'].create({
             'partner_id': member.partner_id.id,
@@ -168,6 +186,7 @@ class AssociationMember(models.Model):
         self._mark_invoice_as_paid(invoice)
         return invoice
 
+    # Marquer la facture comme payée
     def _mark_invoice_as_paid(self, invoice):
         invoice.payment_state = 'paid'
         invoice.amount_residual = 0
@@ -189,10 +208,12 @@ class AssociationMember(models.Model):
         )
         lines_to_reconcile.reconcile()
 
+    # Envoi de l'email de bienvenue
     def _send_welcome_email(self, member, invoice):
         template = self.env.ref('association_management.email_template_welcome_member')
         template.send_mail(member.id, force_send=True)
 
+    # Action pour activer l'adhésion
     def action_activate_membership(self):
         for member in self:
             if member.payment_state == 'paid':
@@ -203,6 +224,7 @@ class AssociationMember(models.Model):
             else:
                 raise UserError(_("Le paiement doit être effectué avant d'activer l'adhésion."))
 
+    # Obtention du prix de l'adhésion
     def _get_membership_price(self, membership_type):
         prices = {
             'regular': 100,
@@ -212,18 +234,15 @@ class AssociationMember(models.Model):
         }
         return prices.get(membership_type, 0)
 
-    @api.model
-    def create(self, vals):
-        if not vals.get('partner_id'):
-            partner = self.env['res.partner'].create({
-                'name': vals.get('name'),
-                'email': vals.get('email'),
-                'phone': vals.get('phone'),
-            })
-            vals['partner_id'] = partner.id
-        
-        if 'first_membership_date' not in vals:
-            vals['first_membership_date'] = fields.Date.today()
-        
-        return super(AssociationMember, self).create(vals)
+    # Surcharge de la méthode d'écriture pour mettre à jour l'email du partenaire
+    def write(self, vals):
+        res = super(AssociationMember, self).write(vals)
+        if 'email' in vals:
+            self.partner_id.write({'email': vals['email']})
+        return res
+
+    # Méthode pour obtenir l'email du membre
+    def get_email(self):
+        self.ensure_one()
+        return self.email or self.partner_id.email or ''
 
